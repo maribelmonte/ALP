@@ -1,0 +1,28 @@
+? /home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/.stack-work/dist/x86_64-linux-tinfo6/Cabal-3.0.1.0/build/autogen/Paths_TP1.hs
+: hash: 83a4dfac263f96aa1a866c746e90457870c395f5e326e9ade54c1cb9f2028d41
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/src/Parser.hs:
+  hash: 240bd992a8dc653ba9e5f5fdadd870fa537f56fee6372a62c12cf622b48a09bc
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/src/Eval1.hs:
+  hash: 52d30fa18a182c719da1ae948138a7fc9d0b7bcd76895b1e68319028a369c076
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/src/Eval2.hs:
+  hash: db1323a43ef2cd4c80c24cc55941f1c8574e051893b6cd5a0a2bdcc0f8102631
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/TP1.cabal:
+  hash: 17c9923d503306b00f7225affc985abdbc22dbc55a62900d3377ae27e5f9584a
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/ChangeLog.md:
+  hash: d671c1d73cb79102b61920326ee7d43c81e9d4d770677cfaccbcfd6c725e41a9
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/src/Eval3.hs:
+  hash: 00cb4beaf64e1f2efc5aa1c2ee404101dfb336fc401cb170556b2a2c0e694c65
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/README.md:
+  hash: ea60c288f6932e34e269e17df780c0c805d9ade594b18b292dad2ea0777ffb6a
+/usr/include/stdc-predef.h:
+  hash: cb08cd5d4cc059a90833ac48a284d25016e8d56ded8ad4cd98d8ac59cc5053f3
+/home/marina/.stack/programs/x86_64-linux/ghc-tinfo6-8.8.3/lib/ghc-8.8.3/include/ghcversion.h:
+  hash: 40d1b759f485f1cd5a54141a6412691ac2b76930507289a16a6a7b89b045b4d2
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/src/AST.hs:
+  hash: 0a4ca758dd20a03feadd2e61857b42819e88356445a78928c90a1c5ef36ddf28
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/src/PPLis.hs:
+  hash: 70913b3d16a281baeecac2fcf153f7e8d28d25b8ac3c957869d8cc460393b3c2
+? /home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/.stack-work/dist/x86_64-linux-tinfo6/Cabal-3.0.1.0/build/autogen/cabal_macros.h
+: hash: 5751eb9b8f8dcbc41b6d89f76fb9f45057f48544b2a1023f1f8663053208d9e1
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/TP1/TP1/package.yaml:
+  hash: b417439568f6de8225c9fc59666bb0da24b57344610892b81a2c919028743663
