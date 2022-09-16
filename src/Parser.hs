@@ -1,9 +1,9 @@
 module Parser where
 
-import           Text.ParserCombinators.Parsec
-import           Text.Parsec.Token
-import           Text.Parsec.Language           ( emptyDef )
-import           AST
+import Text.ParserCombinators.Parsec
+import Text.Parsec.Token
+import Text.Parsec.Language           ( emptyDef )
+import AST
 
 -----------------------
 -- Funcion para facilitar el testing del parser.
@@ -52,6 +52,10 @@ lis = makeTokenParser
 intexp :: Parser (Exp Int)
 intexp = term `chainl1` plusOrminus <|> ternario
 
+term = factor `chainl1` timesOrdiv
+
+factor = try (parens lis intexp) <|> cons <|> var <|> uminus 
+
 cons = do n <- natural lis
           return $ (Const (fromIntegral n))
 
@@ -78,10 +82,6 @@ ternario = do b <- boolexp
               reservedOp lis ":"
               m <- intexp
               return (ECond b n m)
- 
-term = factor `chainl1` timesOrdiv
-
-factor = try (parens lis intexp) <|> cons <|> var <|> uminus 
 
 
 -----------------------------------
@@ -90,6 +90,10 @@ factor = try (parens lis intexp) <|> cons <|> var <|> uminus
 
 boolexp :: Parser (Exp Bool)
 boolexp = bterm `chainl1` orOp
+
+bterm = bfactor `chainl1` andOp
+
+bfactor = (parens lis boolexp) <|> trueOrfalse <|> negation <|> compareOp
 
 trueOrfalse = do reserved lis "true"
                  return BTrue
@@ -113,16 +117,12 @@ compareOp = do n <- intexp
                 <|> do reservedOp lis ">"
                        m <- intexp
                        return (Gt n m)
-                    <|> do reservedOp lis "=="
-                           m <- intexp
-                           return (Eq n m)
-                        <|> do reservedOp lis "!="
-                               m <- intexp
-                               return (NEq n m)
-
-bterm = bfactor `chainl1` andOp
-
-bfactor = (parens lis boolexp) <|> trueOrfalse <|> negation <|> compareOp
+                <|> do reservedOp lis "=="
+                       m <- intexp
+                       return (Eq n m)
+                <|> do reservedOp lis "!="
+                       m <- intexp
+                       return (NEq n m)
 
 
 -----------------------------------

@@ -56,7 +56,7 @@ stepComm (While b c)        s = do (r,w) <- (evalExp b s)
                                    if r then Right (Seq c (While b c) :!: (P.fst s, w)) 
                                         else Right (Skip :!: (P.fst s, w))
 
--- Funciones auxilar
+-- Funcion auxilar
 op f (Right (n,w1)) (Right (m,w2)) s = Right ((f n m), w1+w2-P.snd s)
 op f (Left e)       _              s = Left e
 op f _              (Left e)       s = Left e

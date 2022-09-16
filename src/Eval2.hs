@@ -51,8 +51,8 @@ stepComm (While b c)        s = do r <- evalExp b s
 
 -- Funcion auxilar
 op f (Right n) (Right m) = Right (f n m)
-op f (Left e) _ = Left e
-op f _ (Left e) = Left e
+op f (Left e)  _         = Left e
+op f _         (Left e)  = Left e
 
 -- Evalua una expresion
 
