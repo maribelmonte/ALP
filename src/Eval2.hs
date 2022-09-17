@@ -19,7 +19,7 @@ initState = M.empty
 lookfor :: Variable -> State -> Either Error Int
 lookfor v s = case (M.lookup v s) of 
                    (Just n) -> Right n
-                   Nothing -> Left UndefVar
+                   Nothing  -> Left UndefVar
 
 -- Cambia el valor de una variable en un estado
 update :: Variable -> Int -> State -> State
@@ -45,14 +45,11 @@ stepComm (Seq Skip c)       s = Right (c :!: s)
 stepComm (Seq c d)          s = do r <- stepComm c s 
                                    Right ((Seq (T.fst r) d) :!: T.snd r) 
 stepComm (IfThenElse b c d) s = do r <- evalExp b s
-                                   Right (if r then (c :!: s) else (d :!: s))
+                                   if r then Right (c :!: s) 
+                                        else Right (d :!: s)
 stepComm (While b c)        s = do r <- evalExp b s
-                                   Right (if r then (Seq c (While b c) :!: s) else (Skip :!: s))
-
--- Funcion auxilar
-op f (Right n) (Right m) = Right (f n m)
-op f (Left e)  _         = Left e
-op f _         (Left e)  = Left e
+                                   if r then Right (Seq c (While b c) :!: s)
+                                        else Right (Skip :!: s)
 
 -- Evalua una expresion
 
@@ -62,23 +59,30 @@ evalExp (Const n)     s = Right n
 evalExp (Var v)       s = lookfor v s
 evalExp (UMinus n)    s = do r <- evalExp n s
                              Right (-r)
-evalExp (Plus n m)    s = op (+) (evalExp n s) (evalExp m s)
-evalExp (Minus n m)   s = op (-) (evalExp n s) (evalExp m s)
-evalExp (Times n m)   s = op (*) (evalExp n s) (evalExp m s)
-evalExp (Div n m)     s = do n' <- (evalExp n s) 
-                             m' <- (evalExp m s)
-                             if m' == 0 then Left DivByZero else Right (div n' m')
-evalExp (ECond b n m) s = do b' <- (evalExp b s)
-                             if b' then (evalExp n s) else (evalExp m s)
+evalExp (Plus n m)    s = funAux (+) n m s
+evalExp (Minus n m)   s = funAux (-) n m s
+evalExp (Times n m)   s = funAux (*) n m s
+evalExp (Div n m)     s = do n' <- evalExp n s
+                             m' <- evalExp m s
+                             if m' == 0 then Left DivByZero 
+                                        else Right (div n' m')
+evalExp (ECond b n m) s = do b' <- evalExp b s
+                             if b' then evalExp n s else evalExp m s
 
 -- Expresiones booleanas
 evalExp BTrue     s = Right True 
 evalExp BFalse    s = Right False
-evalExp (Lt n m)  s = op (<)  (evalExp n s) (evalExp m s)
-evalExp (Gt n m)  s = op (>)  (evalExp n s) (evalExp m s)
-evalExp (And b c) s = op (&&) (evalExp b s) (evalExp c s)
-evalExp (Or b c)  s = op (||) (evalExp b s) (evalExp c s)
+evalExp (Lt n m)  s = funAux (<)  n m s
+evalExp (Gt n m)  s = funAux (>)  n m s
+evalExp (And b c) s = funAux (&&) b c s
+evalExp (Or b c)  s = funAux (||) b c s
 evalExp (Not b)   s = do r <- evalExp b s
                          Right (not r) 
-evalExp (Eq n m)  s = op (==) (evalExp n s) (evalExp m s)
-evalExp (NEq n m) s = op (/=) (evalExp n s) (evalExp m s)
+evalExp (Eq n m)  s = funAux (==) n m s
+evalExp (NEq n m) s = funAux (/=) n m s
+
+
+-- Funcion auxiliar                       
+funAux op n m s = do n' <- evalExp n s
+                     m' <- evalExp m s
+                     Right (op n' m')

@@ -44,53 +44,51 @@ stepCommStar c    s = do (c' :!: s') <- stepComm c s
 -- Evalua un paso de un comando en un estado dado
 stepComm :: Comm -> State -> Either Error (Pair Comm State)
 stepComm Skip               s = Right (Skip :!: s)
-stepComm (Let v n)          s = do (r, w) <- (evalExp n s)
-                                   Right (Skip :!: ((M.insert v r (P.fst s)), w))
+stepComm (Let v n)          s = do (r :!: s') <- evalExp n s
+                                   Right (Skip :!: ((M.insert v r (P.fst s')), P.snd s'))
 stepComm (Seq Skip c)       s = Right (c :!: s)
 stepComm (Seq c d)          s = do r <- stepComm c s
                                    Right ((Seq (T.fst r) d) :!: T.snd r)
-stepComm (IfThenElse b c d) s = do (r, w) <- (evalExp b s)
-                                   if r then Right (c :!: (P.fst s, w)) 
-                                        else Right (d :!: (P.fst s, w))
-stepComm (While b c)        s = do (r,w) <- (evalExp b s) 
-                                   if r then Right (Seq c (While b c) :!: (P.fst s, w)) 
-                                        else Right (Skip :!: (P.fst s, w))
-
--- Funcion auxilar
-op f (Right (n,w1)) (Right (m,w2)) s = Right ((f n m), w1+w2-P.snd s)
-op f (Left e)       _              s = Left e
-op f _              (Left e)       s = Left e
+stepComm (IfThenElse b c d) s = do (r :!: s') <- evalExp b s
+                                   if r then Right (c :!: s') 
+                                        else Right (d :!: s')
+stepComm (While b c)        s = do (r :!: s') <- evalExp b s 
+                                   if r then Right (Seq c (While b c) :!: s') 
+                                        else Right (Skip :!: s')
 
 -- Evalua una expresion
 
 -- Expresiones enteras
-evalExp :: Exp a -> State -> Either Error (a, Integer) 
-evalExp (Const n)     s = Right (n, P.snd s)
+evalExp :: Exp a -> State -> Either Error (Pair a State)
+evalExp (Const n)     s = Right (n :!: s)
 evalExp (Var v)       s = do r <- lookfor v s
-                             Right (r, P.snd s)
-evalExp (UMinus n)    s = do (r,w') <- (evalExp n s)
-                             Right (-r, w'+1)
-evalExp (Plus n m)    s = op (+) (evalExp n s) (evalExp m s) (addWork (-2) s)
-evalExp (Minus n m)   s = op (-) (evalExp n s) (evalExp m s) (addWork (-2) s)
-evalExp (Times n m)   s = op (*) (evalExp n s) (evalExp m s) (addWork (-3) s)
-evalExp (Div n m)     s = do (n', w1) <- (evalExp n s) 
-                             (m', w2) <- (evalExp m s)
+                             Right (r :!: s)
+evalExp (UMinus n)    s = do (r :!: s') <- evalExp n s
+                             Right ((-r) :!: addWork 1 s')
+evalExp (Plus n m)    s = funAux (+) n m s 2
+evalExp (Minus n m)   s = funAux (-) n m s 2
+evalExp (Times n m)   s = funAux (*) n m s 3
+evalExp (Div n m)     s = do (n' :!: s1) <- evalExp n s
+                             (m' :!: s2) <- evalExp m s1
                              if m' == 0 then Left DivByZero 
-                                        else Right ((div n' m'), 3+w1+w2-P.snd s)
-evalExp (ECond b n m) s = do (b', w) <- (evalExp b s)
-                             if b' then (evalExp n (P.fst s,w)) else (evalExp m (P.fst s,w))
-                             
+                                        else Right ((div n' m') :!: addWork 3 s2)
+evalExp (ECond b n m) s = do (b' :!: s') <- evalExp b s
+                             if b' then evalExp n s' else evalExp m s'
 
 -- Expresiones booleanas
-evalExp BTrue     s = Right (True, P.snd s) 
-evalExp BFalse    s = Right (False, P.snd s)
-evalExp (Lt n m)  s = op (<)  (evalExp n s) (evalExp m s) (addWork (-2) s)
-evalExp (Gt n m)  s = op (>)  (evalExp n s) (evalExp m s) (addWork (-2) s)
-evalExp (And b c) s = op (&&) (evalExp b s) (evalExp c s) (addWork (-2) s)
-evalExp (Or b c)  s = op (||) (evalExp b s) (evalExp c s) (addWork (-2) s)
-evalExp (Not b)   s = do (r, w') <- (evalExp b s)
-                         Right ((not r),w'+1)
-evalExp (Eq n m)  s = op (==) (evalExp n s) (evalExp m s) (addWork (-2) s)
-evalExp (NEq n m) s = op (/=) (evalExp n s) (evalExp m s) (addWork (-2) s)
+evalExp BTrue     s = Right (True :!: s) 
+evalExp BFalse    s = Right (False :!: s)
+evalExp (Lt n m)  s = funAux (<)  n m s 2
+evalExp (Gt n m)  s = funAux (>)  n m s 2
+evalExp (And b c) s = funAux (&&) b c s 2
+evalExp (Or b c)  s = funAux (||) b c s 2
+evalExp (Not b)   s = do (r :!: s') <- evalExp b s
+                         Right ((not r) :!: addWork 1 s')
+evalExp (Eq n m)  s = funAux (==) n m s 2
+evalExp (NEq n m) s = funAux (/=) n m s 2
 
 
+-- Funcion auxiliar                       
+funAux op n m s w = do (n' :!: s1) <- evalExp n s
+                       (m' :!: s2) <- evalExp m s1
+                       Right ((op n' m') :!: addWork w s2)

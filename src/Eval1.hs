@@ -39,8 +39,10 @@ stepComm Skip               s = (Skip :!: s)
 stepComm (Let v n)          s = (Skip :!: r) where r = M.insert v (evalExp n s) s
 stepComm (Seq Skip c)       s = (c :!: s)
 stepComm (Seq c d)          s = ((Seq (T.fst r) d) :!: T.snd r) where r = stepComm c s
-stepComm (IfThenElse b c d) s = if (evalExp b s) then (c :!: s) else (d :!: s)
-stepComm (While b c)        s = if (evalExp b s) then (Seq c (While b c) :!: s) else (Skip :!: s) 
+stepComm (IfThenElse b c d) s = if evalExp b s then (c :!: s) 
+                                               else (d :!: s)
+stepComm (While b c)        s = if evalExp b s then (Seq c (While b c) :!: s) 
+                                               else (Skip :!: s) 
 
 -- Evalua una expresion
 
@@ -53,13 +55,13 @@ evalExp (Plus n m)    s = (evalExp n s) + (evalExp m s)
 evalExp (Minus n m)   s = (evalExp n s) - (evalExp m s)
 evalExp (Times n m)   s = (evalExp n s) * (evalExp m s)
 evalExp (Div n m)     s = div (evalExp n s) (evalExp m s)
-evalExp (ECond b n m) s = if (evalExp b s) then (evalExp n s) else (evalExp m s)
+evalExp (ECond b n m) s = if evalExp b s then evalExp n s else evalExp m s
 
 -- Expresiones booleanas
 evalExp BTrue     s = True 
 evalExp BFalse    s = False
-evalExp (Lt n m)  s = (evalExp n s) < (evalExp m s)
-evalExp (Gt n m)  s = (evalExp n s) > (evalExp m s)
+evalExp (Lt n m)  s = (evalExp n s) <  (evalExp m s)
+evalExp (Gt n m)  s = (evalExp n s) >  (evalExp m s)
 evalExp (And b c) s = (evalExp b s) && (evalExp c s)
 evalExp (Or b c)  s = (evalExp b s) || (evalExp c s)
 evalExp (Not b)   s = not (evalExp b s) 
