@@ -18,17 +18,17 @@ initState = (M.empty, 0)
 
 -- Busca el valor de una variable en un estado
 lookfor :: Variable -> State -> Either Error Int
-lookfor v (s,w) = case (M.lookup v s) of 
-                       (Just n) -> Right n
+lookfor v (s,w) = case M.lookup v s of 
+                       Just n  -> Right n
                        Nothing -> Left UndefVar
 
 -- Cambia el valor de una variable en un estado
 update :: Variable -> Int -> State -> State
-update k v (s,w) = (M.adjust (\x -> v) k s, w)
+update k v (s,w) = (M.insert k v s, w)
 
 -- Suma un costo dado al estado
 addWork :: Integer -> State -> State
-addWork w' (s,w) = (s,w+w')
+addWork w' (s,w) = (s, w+w')
 
 -- Evalua un programa en el estado nulo
 eval :: Comm -> Either Error State
@@ -45,10 +45,10 @@ stepCommStar c    s = do (c' :!: s') <- stepComm c s
 stepComm :: Comm -> State -> Either Error (Pair Comm State)
 stepComm Skip               s = Right (Skip :!: s)
 stepComm (Let v n)          s = do (r :!: s') <- evalExp n s
-                                   Right (Skip :!: ((M.insert v r (P.fst s')), P.snd s'))
+                                   Right (Skip :!: update v r s')
 stepComm (Seq Skip c)       s = Right (c :!: s)
-stepComm (Seq c d)          s = do r <- stepComm c s
-                                   Right ((Seq (T.fst r) d) :!: T.snd r)
+stepComm (Seq c d)          s = do (c' :!: s') <- stepComm c s
+                                   Right ((Seq c' d) :!: s')
 stepComm (IfThenElse b c d) s = do (r :!: s') <- evalExp b s
                                    if r then Right (c :!: s') 
                                         else Right (d :!: s')
