@@ -57,14 +57,16 @@ term = factor `chainl1` timesOrdiv
 factor = try (parens lis intexp) <|> cons <|> var <|> uminus 
 
 cons = do n <- natural lis
-          return $ (Const (fromIntegral n))
+          return (Const (fromIntegral n))
 
 var = do v <- identifier lis
          return (Var v)  
 
 uminus = do reservedOp lis "-"
-            n <- intexp 
-            return (UMinus n)
+            do n <- factor
+               return (UMinus n) 
+             <|> do n <- intexp 
+                    return (UMinus n) 
 
 plusOrminus = do reservedOp lis "+"
                  return Plus 
@@ -101,8 +103,11 @@ trueOrfalse = do reserved lis "true"
                      return BFalse
 
 negation = do reservedOp lis "!"
-              b <- boolexp 
-              return (Not b)
+              do b <- bfactor
+                 return (Not b)
+               <|> do b <- boolexp 
+                      return (Not b)
+              
 
 andOp = do reservedOp lis "&&"
            return And
