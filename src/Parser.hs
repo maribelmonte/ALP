@@ -107,7 +107,6 @@ negation = do reservedOp lis "!"
                  return (Not b)
                <|> do b <- boolexp 
                       return (Not b)
-              
 
 andOp = do reservedOp lis "&&"
            return And

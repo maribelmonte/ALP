@@ -57,9 +57,9 @@ stepComm (While b c)        s = do (r :!: s') <- evalExp b s
                                         else Right (Skip :!: s')
 
 -- Evalua una expresion
+evalExp :: Exp a -> State -> Either Error (Pair a State)
 
 -- Expresiones enteras
-evalExp :: Exp a -> State -> Either Error (Pair a State)
 evalExp (Const n)     s = Right (n :!: s)
 evalExp (Var v)       s = do r <- lookfor v s
                              Right (r :!: s)
