@@ -1,0 +1,6 @@
+
+def t = \rm:Nat -> Nat . \pm: Nat . \n:Nat . R (rm (suc 0)) (\rn:Nat . \pn:Nat . rm rn) n
+
+def ack = \m:Nat . R (\n:Nat . suc n) t m
+
+

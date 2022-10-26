@@ -1,0 +1,20 @@
+-- append
+def append = Y (\f x y. (isnil x) y (cons (head x) (f (tail x) y)))
+
+-- mapN
+def mapN' = Y (\f g p i. (isnil (snd p)) (fst p) (f g (pair (append (fst p) (cons (i g (head (snd p))) nil)) (tail (snd p))) (suc i)))
+def mapN = (\f xs. mapN' f (pair nil xs) 0)
+
+-- Ejemplos
+def a = mapN (\x. (and x false)) (cons true (cons false nil))
+-- resultado: (cons true (cons false nil))
+
+def b = mapN (suc) (cons 0 (cons 0 (cons 0 (cons 0 nil))))
+-- resultado: (cons 0 (cons 1 (cons 2 (cons 3 nil))))
+
+def c = mapN (add 2) (cons 0 (cons 0 (cons 0 (cons 0 nil))))
+-- resultado: (cons 0 (cons 2 (cons 4 (cons 6 nil))))
+
+def d = mapN (mult 2) (cons 1 (cons 1 (cons 1 (cons 1 nil))))
+-- resultado: (cons 1 (cons 2 (cons 4 (cons 8 nil))))
+
