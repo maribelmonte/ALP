@@ -21,8 +21,8 @@ conversion :: LamTerm -> Term
 conversion = conversion' []
 
 conversion' :: [String] -> LamTerm -> Term
-conversion' b (LVar n    ) = maybe (Free (Global n)) Bound (n `elemIndex` b)
-conversion' b (LApp t u  ) = conversion' b t :@: conversion' b u
+conversion' b (LVar n)     = maybe (Free (Global n)) Bound (n `elemIndex` b)
+conversion' b (LApp t u)   = conversion' b t :@: conversion' b u
 conversion' b (LAbs n t u) = Lam t (conversion' (n : b) u)
 conversion' b (LLet s t u) = Let (conversion' b t) (conversion' (s : b) u)
 conversion' b (LAs s t)    = As (conversion' b s) t
@@ -42,7 +42,7 @@ sub :: Int -> Term -> Term -> Term
 sub i t (Bound j) | i == j    = t
 sub _ _ (Bound j) | otherwise = Bound j
 sub _ _ (Free n   )           = Free n
-sub i t (u   :@: v)           = sub i t u :@: sub i t v
+sub i t (u :@: v)             = sub i t u :@: sub i t v
 sub i t (Lam t'  u)           = Lam t' (sub (i + 1) t u)
 sub i t (Let u v)             = Let (sub i t u) (sub i t v)
 sub i t (As s u)              = As (sub i t s) u
@@ -56,41 +56,45 @@ sub i t (Rec u v w)           = Rec (sub i t u) (sub i t v) (sub i t w)
 
 -- evaluador de términos
 eval :: NameEnv Value Type -> Term -> Value
-eval _ (Bound _             ) = error "variable ligada inesperada en eval"
-eval e (Free  n             ) = fst $ fromJust $ lookup n e
-eval _ (Lam      t   u      ) = VLam t u
+eval _ (Bound _)              = error "variable ligada inesperada en eval"
+eval e (Free  n)              = fst $ fromJust $ lookup n e
+eval _ (Lam t u)              = VLam t u
 eval e (Lam _ u  :@: Lam s v) = eval e (sub 0 (Lam s v) u)
-eval e (Lam t u1 :@: u2) = let v2 = eval e u2 in eval e (sub 0 (quote v2) u1)
-eval e (u        :@: v      ) = case eval e u of
-  VLam t u' -> eval e (Lam t u' :@: v)
-  _         -> error "Error de tipo en run-time, verificar type checker"
-eval e (Let t u             ) = let v = eval e t in eval e (sub 0 (quote v) u)
-eval e (As s t              ) = eval e s 
-eval e (Unit                ) = VUnit
-eval e (Fst (Pair t u)      ) = eval e t
-eval e (Snd (Pair t u)      ) = eval e u
-eval e (Pair t u            ) = VPair (eval e t) (eval e u)
-eval e (Zero                ) = VNum NZero
-eval e (Suc t               ) = case eval e t of 
-  VNum nv -> VNum (NSuc nv)
-  _       -> error "Error de tipo en run-time, verificar type checker"
-eval e (Rec t u v          ) = case eval e v of
-  VNum NZero -> eval e t 
-  VNum (NSuc nv) -> eval e (u :@: (Rec t u v') :@: v') 
-                      where v' = quote (VNum nv)
-  _ -> error "Error de tipo en run-time, verificar type checker"
+eval e (Lam t u1 :@: u2)      = let v2 = eval e u2 in eval e (sub 0 (quote v2) u1)
+eval e (u        :@: v)       = case eval e u of
+                                     VLam t u' -> eval e (Lam t u' :@: v)
+                                     _         -> error "Error de tipo en run-time, verificar type checker"
+eval e (Let t u)              = let v = eval e t in eval e (sub 0 (quote v) u)
+eval e (As s t)               = eval e s 
+eval e (Unit)                 = VUnit
+eval e (Fst (Pair t u))       = case eval e (Pair t u) of
+                                     VPair t' u' -> t'
+                                     _           -> error "Error de tipo en run-time, verificar type checker"
+eval e (Snd (Pair t u))       = case eval e (Pair t u) of
+                                     VPair t' u' -> u'
+                                     _           -> error "Error de tipo en run-time, verificar type checker"
+eval e (Pair t u)             = VPair (eval e t) (eval e u)
+eval e (Zero)                 = VNum NZero
+eval e (Suc t)                = case eval e t of 
+                                     VNum nv -> VNum (NSuc nv)
+                                     _       -> error "Error de tipo en run-time, verificar type checker"
+eval e (Rec t u v)            = case eval e v of
+                                     VNum NZero -> eval e t 
+                                     VNum (NSuc nv) -> eval e (u :@: (Rec t u v') :@: v')
+                                                          where v' = quote (VNum nv)
+                                     _ -> error "Error de tipo en run-time, verificar type checker"
 
 -----------------------
 --- quoting
 -----------------------
 
 quote :: Value -> Term
-quote (VLam t f) = Lam t f
-quote (VUnit)    = Unit
-quote (VPair t u)= Pair (quote t) (quote u)
-quote (VNum nv ) = case nv of
-                        NZero -> Zero
-                        NSuc nv' -> Suc (quote (VNum nv'))
+quote (VLam t f)  = Lam t f
+quote (VUnit)     = Unit
+quote (VPair t u) = Pair (quote t) (quote u)
+quote (VNum nv )  = case nv of
+                         NZero    -> Zero
+                         NSuc nv' -> Suc (quote (VNum nv'))
 
 ----------------------
 --- type checker
@@ -128,35 +132,37 @@ notfoundError :: Name -> Either String Type
 notfoundError n = err $ show n ++ " no está definida."
 
 infer' :: Context -> NameEnv Value Type -> Term -> Either String Type
-infer' c _ (Bound i) = ret (c !! i)
-infer' _ e (Free  n) = case lookup n e of
-  Nothing     -> notfoundError n
-  Just (_, t) -> ret t
-infer' c e (t :@: u) = infer' c e t >>= \tt -> infer' c e u >>= \tu ->
-  case tt of
-    FunT t1 t2 -> if (tu == t1) then ret t2 else matchError t1 tu
-    _          -> notfunError tt
-infer' c e (Lam t u) = infer' (t : c) e u >>= \tu -> ret $ FunT t tu
-infer' c e (Let t u) = infer' c e t >>= \tt -> infer' (tt : c) e u 
-infer' c e (As s t) = infer' c e s >>= \ts -> if ts == t then ret t else matchError t ts
-infer' c e (Unit) = ret UnitT
-infer' c e (Fst t) = infer' c e t >>= \tt -> 
-  case tt of
-    PairT t1 t2 -> ret t1
-    _           ->  err "No se puede aplicar fst a algo que no sea una tupla"
-infer' c e (Snd t) = infer' c e t >>= \tt -> 
-  case tt of
-    PairT t1 t2 -> ret t2
-    _           ->  err "No se puede aplicar snd a algo que no sea una tupla"
-infer' c e (Pair t u) = infer' c e t >>= \tt -> infer' c e u >>= \tu -> ret (PairT tt tu)
-infer' c e (Zero) = ret NatT
-infer' c e (Suc t) = infer' c e t >>= \tt -> if tt == NatT then ret NatT else matchError NatT tt
-infer' c e (Rec t u v) = infer' c e t >>= \tt -> infer' c e u >>= \tu ->
-  case tu of 
-    FunT t1 (FunT NatT t2) -> if t1 == tt && t2 == tt then infer' c e v >>= \tv -> case tv of
-                                                                                        NatT -> ret tt
-                                                                                        _   -> matchError NatT tv
-                                                         else if t1 == tt then matchError tt t2
-                                                                          else matchError tt t1
-    _ -> matchError (FunT tt (FunT NatT tt)) tu
+infer' c _ (Bound i)   = ret (c !! i)
+infer' _ e (Free  n)   = case lookup n e of
+                              Nothing     -> notfoundError n
+                              Just (_, t) -> ret t
+infer' c e (t :@: u)   = infer' c e t >>= \tt ->
+                         infer' c e u >>= \tu ->
+                         case tt of
+                              FunT t1 t2 -> if (tu == t1) then ret t2 else matchError t1 tu
+                              _          -> notfunError tt
+infer' c e (Lam t u)   = infer' (t : c) e u >>= \tu -> ret $ FunT t tu
+infer' c e (Let t u)   = infer' c e t >>= \tt -> infer' (tt : c) e u 
+infer' c e (As s t)    = infer' c e s >>= \ts -> if ts == t then ret t else matchError t ts
+infer' c e (Unit)      = ret UnitT
+infer' c e (Fst t)     = infer' c e t >>= \tt -> 
+                         case tt of
+                              PairT t1 t2 -> ret t1
+                              _           ->  err "No se puede aplicar fst a algo que no sea una tupla"
+infer' c e (Snd t)     = infer' c e t >>= \tt -> 
+                         case tt of
+                              PairT t1 t2 -> ret t2
+                              _           ->  err "No se puede aplicar snd a algo que no sea una tupla"
+infer' c e (Pair t u)  = infer' c e t >>= \tt -> infer' c e u >>= \tu -> ret (PairT tt tu)
+infer' c e (Zero)      = ret NatT
+infer' c e (Suc t)     = infer' c e t >>= \tt -> if tt == NatT then ret NatT else matchError NatT tt
+infer' c e (Rec t u v) = infer' c e t >>= \tt -> 
+                         infer' c e u >>= \tu ->
+                        case tu of 
+                        FunT t1 (FunT NatT t2) -> if t1 == tt && t2 == tt then infer' c e v >>= \tv -> case tv of
+                                                                                                            NatT -> ret tt
+                                                                                                            _   -> matchError NatT tv
+                                                                          else if t1 == tt then matchError tt t2
+                                                                                           else matchError tt t1
+                        _                       -> matchError (FunT tt (FunT NatT tt)) tu
 ----------------------------------

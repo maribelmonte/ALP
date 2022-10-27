@@ -23,10 +23,10 @@ parensIf False = id
 -- pretty-printer de términos
 
 pp :: Int -> [String] -> Term -> Doc
-pp ii vs (Bound k         ) = text (vs !! (ii - k - 1))
+pp ii vs (Bound k)          = text (vs !! (ii - k - 1))
 pp _  _  (Free  (Global s)) = text s
 
-pp ii vs (i :@: c         ) = sep
+pp ii vs (i :@: c) = sep
   [ parensIf (isLam i) (pp ii vs i)
   , nest 1 (parensIf (isLam c || isApp c) (pp ii vs c))
   ]
@@ -107,19 +107,19 @@ isFun (FunT _ _) = True
 isFun _          = False
 
 fv :: Term -> [String]
-fv (Bound _         ) = []
+fv (Bound _)          = []
 fv (Free  (Global n)) = [n]
-fv (t   :@: u       ) = fv t ++ fv u
-fv (Lam _   u       ) = fv u
-fv (Let t u         ) = fv t ++ fv u
-fv (As s t          ) = fv s
-fv (Unit            ) = []
-fv (Fst t           ) = fv t
-fv (Snd t           ) = fv t
-fv (Pair t u        ) = fv t ++ fv u
-fv (Zero) = []
-fv (Suc t) = fv t 
-fv (Rec t u v) = fv t ++ fv u ++ fv v
+fv (t :@: u)          = fv t ++ fv u
+fv (Lam _   u)        = fv u
+fv (Let t u)          = fv t ++ fv u
+fv (As s t)           = fv s
+fv (Unit)             = []
+fv (Fst t)            = fv t
+fv (Snd t)            = fv t
+fv (Pair t u)         = fv t ++ fv u
+fv (Zero)             = []
+fv (Suc t)            = fv t 
+fv (Rec t u v)        = fv t ++ fv u ++ fv v
 
 ---
 printTerm :: Term -> Doc
