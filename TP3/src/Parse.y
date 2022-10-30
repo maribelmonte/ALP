@@ -61,7 +61,6 @@ Exp     :: { LamTerm }
         | Exp AS Type                  { LAs $1 $3 }
         | FST Exp                      { LFst $2 }
         | SND Exp                      { LSnd $2 }
-        | '(' Exp ',' Exp ')'          { LPair $2 $4 }
         | SUC Exp                      { LSuc $2 }
         | REC Atom Atom Exp            { LRec $2 $3 $4 }
         | NAbs                         { $1 }
@@ -75,6 +74,7 @@ Atom    :: { LamTerm }
         | UNIT                         { LUnit }
         | ZERO                         { LZero }
         | '(' Exp ')'                  { $2 }
+        | '(' Exp ',' Exp ')'          { LPair $2 $4 }
 
 Type    : TYPEE                        { EmptyT }
         | Type '->' Type               { FunT $1 $3 }
