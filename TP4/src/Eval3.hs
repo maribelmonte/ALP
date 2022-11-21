@@ -44,7 +44,7 @@ instance Monad StateErrorTrace where
   return x = StateErrorTrace (\s -> Right (x :!: (s :!: initTrace)))
   m >>= f  = StateErrorTrace (\s -> do (x :!: (s' :!: t)) <- runStateErrorTrace m s
                                        (x' :!: (s'' :!: t')) <- runStateErrorTrace (f x) s' 
-                                       return (x' :!: (s'' :!: t ++ t')))
+                                       Right (x' :!: (s'' :!: t ++ t')))
 -- Ejercicio 3.b: Resolver en Monad.hs
 
 -- Ejercicio 3.c: Dar una instancia de MonadTrace para StateErrorTrace.

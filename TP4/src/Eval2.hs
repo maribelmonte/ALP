@@ -36,9 +36,7 @@ instance Applicative StateError where
 -- Ejercicio 2.a: Dar una instancia de Monad para StateError:
 instance Monad StateError where
   return x = StateError (\s -> Right (x :!: s))
-  m >>= f = StateError (\s -> case runStateError m s of
-                                  Left e -> Left e
-                                  Right (x :!: s') -> runStateError (f x) s')
+  m >>= f = StateError (\s -> runStateError m s >>= (\(x :!: s') -> runStateError (f x) s'))
 
 -- Ejercicio 2.b: Dar una instancia de MonadError para StateError:
 instance MonadError StateError where
@@ -66,7 +64,7 @@ stepCommStar c    = stepComm c >>= \c' -> stepCommStar c'
 -- Evalua un paso de un comando
 stepComm :: (MonadState m, MonadError m) => Comm -> m Comm
 stepComm Skip               = return Skip
-stepComm (Let v n)          = evalExp n >>= (update v) >>= (\_ -> return Skip)
+stepComm (Let v n)          = evalExp n >>= (update v) >> return Skip
 stepComm (Seq Skip c)       = return c
 stepComm (Seq c d)          = stepComm c >>= (\c' -> return (Seq c' d))
 stepComm (IfThenElse b c d) = evalExp b >>= (\b' -> if b' then return c else return d)
