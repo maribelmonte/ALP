@@ -1,0 +1,32 @@
+/usr/lib/ghc/include/ghcversion.h:
+  hash: 297e8571427d670d413977834f5cdfc77cb89051d2f5b8302303c442346d15d0
+? /home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/.stack-work/dist/x86_64-linux-tinfo6/Cabal-3.0.1.0/build/autogen/Paths_TP4.hs
+: hash: c51ac46ddf77bc70ce2e0580a7149e60124b30bcd8ae3d965733ea1c386e0f3d
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/src/AST.hs:
+  hash: d8c877129e22fe7ba2be7b6f777f49d0d03ed14fecc8e2ba91b5ce5a06fd2854
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/src/PPLis.hs:
+  hash: c409b29624efc43bc73e60ef2e19a573a1e74fb4bb6aefe287321b73195a274b
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/ChangeLog.md:
+  hash: 2988da173f5da20cdf97238775211e1f9a9d287b30af970ba3eff4acac848fe0
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/src/Eval3.hs:
+  hash: 260e5c50a46f10d23851c9740673067d387f756f7696d8679f1dc19111e0d7c8
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/src/Parser.hs:
+  hash: a3f58687fbdb9a44fecbad4c62a3776a216e972479f348fdb065215d80495baa
+/usr/include/stdc-predef.h:
+  hash: cb08cd5d4cc059a90833ac48a284d25016e8d56ded8ad4cd98d8ac59cc5053f3
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/src/Monads.hs:
+  hash: 6576bce5cd70ffab9213e3aa6812632d0a83874755f30ffa0e38c69876d2bc59
+/home/marina/.stack/programs/x86_64-linux/ghc-tinfo6-8.8.3/lib/ghc-8.8.3/include/ghcversion.h:
+  hash: 40d1b759f485f1cd5a54141a6412691ac2b76930507289a16a6a7b89b045b4d2
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/src/Eval2.hs:
+  hash: a8734780fc2f8db07c1320ac9d4f2709152dc012ed25a49584569ec2f8e8b7e3
+? /home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/.stack-work/dist/x86_64-linux-tinfo6/Cabal-3.0.1.0/build/autogen/cabal_macros.h
+: hash: c8b85e92a2572f54f7f8345d03596dfe344d836ea286020b8fc10fc420c4825a
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/TP4.cabal:
+  hash: 9d36cfeae1a5835bad9c2334fb24699083fe4203cbc19a59e2f3e5bf5a54ca2f
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/package.yaml:
+  hash: 2b26884f82e8c52ee8d76e1cf6b1a3e0207b43c0b138e3a9cc379c058c44c320
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/README.md:
+  hash: fe95c0d5d3071fe892649d0c1ae40b8fdd819783b9e4db918a554c3cba148783
+/home/marina/Documentos/FCEIA/Tercero/Análisis de Lenguajes de Programación/ALP/TP4/src/Eval1.hs:
+  hash: 035ca912a16499fc1ec36427ad4306a768cda81bcbaa6a116ec7e8c9ea88a8f9
