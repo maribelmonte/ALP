@@ -67,13 +67,15 @@ stepComm (While b c)        = evalExp b >>= (\b' -> if b' then return (Seq c (Wh
 evalExp :: MonadState m => Exp a -> m a
 
 -- Expresiones enteras
-evalExp (Const n)   = return n
-evalExp (Var v)     = lookfor v
-evalExp (UMinus n)  = evalExp n >>= (\n' -> return (- n'))
-evalExp (Plus n m)  = evalExp n >>= (\n' -> evalExp m >>= (\m' -> return (n' + m')))
-evalExp (Minus n m) = evalExp n >>= (\n' -> evalExp m >>= (\m' -> return (n' - m')))
-evalExp (Times n m) = evalExp n >>= (\n' -> evalExp m >>= (\m' -> return (n' * m')))
-evalExp (Div n m)   = evalExp n >>= (\n' -> evalExp m >>= (\m' -> return (div n' m')))
+evalExp (Const n)    = return n
+evalExp (Var v)      = lookfor v
+evalExp (UMinus n)   = evalExp n >>= (\n' -> return (- n'))
+evalExp (Plus n m)   = evalExp n >>= (\n' -> evalExp m >>= (\m' -> return (n' + m')))
+evalExp (Minus n m)  = evalExp n >>= (\n' -> evalExp m >>= (\m' -> return (n' - m')))
+evalExp (Times n m)  = evalExp n >>= (\n' -> evalExp m >>= (\m' -> return (n' * m')))
+evalExp (Div n m)    = evalExp n >>= (\n' -> evalExp m >>= (\m' -> return (div n' m')))
+evalExp (EAssgn v n) = evalExp n >>= (\n' -> update v n' >> return n')
+evalExp (ESeq n m)   = evalExp n >> evalExp m
 
 -- Expresiones booleanas
 evalExp BTrue     = return True 
@@ -85,5 +87,3 @@ evalExp (Or b c)  = evalExp b >>= (\b' -> evalExp c >>= (\c' -> return (b' || c'
 evalExp (Not b)   = evalExp b >>= (\b' -> return (not b')) 
 evalExp (Eq n m)  = evalExp n >>= (\n' -> evalExp m >>= (\m' -> return (n' == m')))
 evalExp (NEq n m) = evalExp n >>= (\n' -> evalExp m >>= (\m' -> return (n' /=  m')))
-
-
