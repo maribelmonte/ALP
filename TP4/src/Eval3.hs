@@ -64,10 +64,10 @@ instance MonadState StateErrorTrace where
 
 -- Ejercicio 3.f: Implementar el evaluador utilizando la monada StateErrorTrace.
 -- Evalua un programa en el estado nulo
-eval :: Comm -> Either Error (Pair Env Trace)
+eval :: Comm -> Either Error (Env, Trace)
 eval p = case runStateErrorTrace (stepCommStar p) initEnv of
             Left e -> Left e
-            Right (x :!: s) -> Right s
+            Right (x :!: (s :!: t)) -> Right (s, t)
 
 -- Evalua multiples pasos de un comando, hasta alcanzar un Skip
 stepCommStar :: (MonadState m, MonadError m, MonadTrace m) => Comm -> m ()
